@@ -54,6 +54,7 @@ export const createCard = async (req, res) => {
     });
     res.status(201).json(card);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: 'Failed to create card' });
   }
 };
