@@ -18,6 +18,8 @@ export default function BoardDetail({ }) {
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [gifSearchTerm, setGifSearchTerm] = useState("");
+  const [gifResults, setGifResults] = useState([]);
 
   useEffect(() => {
     async function loadData() {
@@ -42,6 +44,13 @@ export default function BoardDetail({ }) {
       errors.gif = "GIF must be a valid image URL";
     }
     return errors;
+  }
+
+  async function searchGifs(term) {
+    const apiKey = import.meta.env.VITE_GIPHY_API_KEY;
+    const res = await fetch(`https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(term)}&api_key=${apiKey}&limit=10`);
+    const data = await res.json();
+    setGifResults(data.data);
   }
 
   async function handleSubmit(e) {
@@ -130,7 +139,7 @@ export default function BoardDetail({ }) {
           {formErrors.description && <div style={{ color: "red" }}>{formErrors.description}</div>}
         </div>
   
-        <div>
+        {/* <div>
           <label>GIF URL*</label>
           <input
             type="url"
@@ -138,8 +147,48 @@ export default function BoardDetail({ }) {
             onChange={(e) => setFormData({ ...formData, gif: e.target.value })}
           />
           {formErrors.gif && <div style={{ color: "red" }}>{formErrors.gif}</div>}
-        </div>
+        </div> */}
   
+        <div>
+          <label>Search for a GIF</label>
+          <input
+            type="text"
+            value={gifSearchTerm}
+            onChange={(e) => setGifSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                searchGifs(gifSearchTerm);
+              }
+            }}
+            placeholder="Type keywords and hit Enter"
+          />
+        </div>
+
+        <div className="gif-results" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "10px" }}>
+          {gifResults.map((gif) => (
+            <img
+              key={gif.id}
+              src={gif.images.fixed_height_small.url}
+              alt={gif.title}
+              style={{
+                cursor: "pointer",
+                border: formData.gif === gif.images.fixed_height_small.url ? "2px solid blue" : "1px solid gray"
+              }}
+              onClick={() => setFormData({ ...formData, gif: gif.images.fixed_height_small.url })}
+            />
+          ))}
+        </div>
+
+        {formData.gif && (
+          <div style={{ marginTop: "10px" }}>
+            <p>Selected GIF:</p>
+            <img src={formData.gif} alt="Selected GIF" style={{ height: "100px" }} />
+          </div>
+        )}
+
+        {formErrors.gif && <div style={{ color: "red" }}>{formErrors.gif}</div>}
+
         <div>
           <label>Author (optional)</label>
           <input

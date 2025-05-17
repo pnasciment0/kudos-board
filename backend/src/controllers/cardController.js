@@ -27,6 +27,7 @@ export const getCardById = async (req, res) => {
 
 // GET cards by board ID
 export const getCardsByBoardId = async (req, res) => {
+  console.log("getCardsByBoardId hit");
   try {
     const cards = await prisma.card.findMany({
       where: { boardId: Number(req.params.boardId) }
@@ -39,7 +40,7 @@ export const getCardsByBoardId = async (req, res) => {
 
 // CREATE card
 export const createCard = async (req, res) => {
-  const { description, author, gif, boardId } = req.body;
+  const { description, author, gif, boardId, title } = req.body;
 
   try {
     const card = await prisma.card.create({
@@ -47,7 +48,8 @@ export const createCard = async (req, res) => {
         message:description,
         author,
         gif,
-        board: { connect: { id: Number(boardId) } }
+        board: { connect: { id: Number(boardId) } },
+        title
       }
     });
     res.status(201).json(card);

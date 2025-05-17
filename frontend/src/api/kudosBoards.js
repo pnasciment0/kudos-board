@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:3000/api/boards';
+// const API_BASE = 'http://localhost:3000/api/boards';
+const API_BASE = import.meta.env.VITE_API_BASE_URL + 'api/boards';
 
 export async function fetchBoards(category = 'all', search = '') {
   try {
